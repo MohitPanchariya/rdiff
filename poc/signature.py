@@ -36,7 +36,7 @@ class Checksum:
     https://rsync.samba.org/tech_report/node2.html
     '''
     def strongChecksum(self, block: bytes):
-        return hashlib.new("md4", block).hexdigest()
+        return hashlib.new("md4", block).digest()
 
     '''
     Size of weak checksum in bytes
@@ -60,7 +60,7 @@ class Signature:
     def __init__(self, checksum: Checksum, blockSize: int = 1024):
         self.blockSize = blockSize
         self.checksum = checksum
-
+    
     def setBlockSize(self, blockSize: int):
         self.blockSize = blockSize
 
@@ -98,6 +98,5 @@ class Signature:
                                                     byteorder = "big"))
 
 
-                strongChecksum = bytes(strongChecksum, "utf-8")
 
                 sigFile.write(strongChecksum)
