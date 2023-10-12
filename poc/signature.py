@@ -12,15 +12,17 @@ class Checksum:
     used in the rsync algorithm.
     https://rsync.samba.org/tech_report/node3.html
     '''
-    def weakChecksum(self, block: bytes):
-        a = b = s = i = 0
+    def weakChecksum(self, block: bytes, startIndex: int, endIndex: int):
+        a = b = s = 0
         blockSize = len(block)
+
+        if blockSize != (endIndex - startIndex + 1):
+            raise Exception("Inconsistent start and end index. Doesn't "
+                            "match block size.")
 
         for byte in block:
             a += byte
-            b += ((blockSize - i + 1) * byte)
-
-            i += 1
+            b += ((endIndex - startIndex + 1) * byte)
 
         a %= self.modulus
         b %= self.modulus
@@ -90,13 +92,17 @@ class Signature:
 
             weakChecksumSize = Checksum.weakChecksumSize()
 
+            startIndex = 0
+            endIndex = 0
+            
             for block in iter(partial(inFile.read, self.blockSize), b''):
-                weakChecksum = self.checksum.weakChecksum(block)
+                blockSize = len(block)
+                endIndex += (blockSize - 1)
+                weakChecksum = self.checksum.weakChecksum(block, startIndex, endIndex)
                 strongChecksum = self.checksum.strongChecksum(block)
 
-                sigFile.write(weakChecksum.to_bytes(weakChecksumSize, 
-                                                    byteorder = "big"))
-
-
+                sigFile.write(weakChecksum.to_bytes(weakChecksumSize, byteorder = "big"))
 
                 sigFile.write(strongChecksum)
+
+                startIndex = endIndex
