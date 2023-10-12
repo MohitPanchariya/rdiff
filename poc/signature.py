@@ -32,7 +32,19 @@ class Checksum:
 
         s = a + (self.modulus * b)
 
-        return s
+        return (a, b, s)
+    
+    def rollingChecksum(self, previousChecksumA: int, previousChecksumB: int, 
+                        previousByte: int, endByte: int, startIndex: int, 
+                        endIndex: int):
+        
+        checksumA = (previousChecksumA - previousByte + endByte) % self.modulus
+        checksumB = ((previousChecksumB - (((endIndex - 1) - (startIndex - 1) + 1) * 
+                                           (previousByte)) + checksumA) % self.modulus)
+        
+        checksumS = checksumA + (self.modulus * checksumB)
+
+        return (checksumA, checksumB, checksumS)
     
     '''
     Calculate the strong checksum for the block.
@@ -101,7 +113,7 @@ class Signature:
             for block in iter(partial(inFile.read, self.blockSize), b''):
                 blockSize = len(block)
                 endIndex += (blockSize - 1)
-                weakChecksum = self.checksum.weakChecksum(block, startIndex, endIndex)
+                _, _, weakChecksum = self.checksum.weakChecksum(block, startIndex, endIndex)
                 strongChecksum = self.checksum.strongChecksum(block)
 
                 sigFile.write(weakChecksum.to_bytes(weakChecksumSize, byteorder = "big"))
