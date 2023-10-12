@@ -20,9 +20,12 @@ class Checksum:
             raise Exception("Inconsistent start and end index. Doesn't "
                             "match block size.")
 
+        i = startIndex
         for byte in block:
             a += byte
-            b += ((endIndex - startIndex + 1) * byte)
+            b += ((endIndex - i + 1) * byte)
+
+            i += 1
 
         a %= self.modulus
         b %= self.modulus
@@ -94,7 +97,7 @@ class Signature:
 
             startIndex = 0
             endIndex = 0
-            
+
             for block in iter(partial(inFile.read, self.blockSize), b''):
                 blockSize = len(block)
                 endIndex += (blockSize - 1)
