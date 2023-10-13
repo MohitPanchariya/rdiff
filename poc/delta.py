@@ -116,6 +116,9 @@ class Delta:
 
                         self.__writeCopyCommand(deltaFile, blockIndex, blockSize)
 
+                else:
+                    matched = False
+
                 if not matched:
                     startIndex += 1
 
