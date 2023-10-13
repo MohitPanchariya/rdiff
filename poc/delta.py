@@ -54,6 +54,8 @@ class Delta:
         deltaFile.write(len(buffer).to_bytes(4, byteorder="big"))
         deltaFile.write(buffer)
 
+        buffer.clear()
+
     def createDeltaFile(self, inFilePath, deltaFilePath, sigFielPath, blockSize: int, checksum: Checksum):
         self.__createSignatureDict(sigFielPath)
         signatures = self.signatures
