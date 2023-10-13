@@ -95,7 +95,7 @@ class Delta:
                     strongChecksum = checksum.strongChecksum(block)
                     if signatures[weakChecksum][1] == strongChecksum:
                         matched = True
-                        startIndex = endIndex
+                        startIndex = endIndex + 1
 
                         # if not firstBlock:
                         if previousCommand == self.LITERAL_COMMAND:
