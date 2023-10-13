@@ -66,10 +66,6 @@ class Delta:
 
         with (open(inFilePath, "rb") as inFile,
               open(deltaFilePath, "wb") as deltaFile):
-            block = inFile.read(blockSize)
-
-            if not block:
-                return
 
             startIndex = 0
             firstBlock = True
@@ -116,8 +112,8 @@ class Delta:
                         previousCommand = self.COPY_COMMAND
 
 
-                        self.__writeCopyCommand(deltaFile, blockIndex, blockSize)                      
-                
+                        self.__writeCopyCommand(deltaFile, blockIndex, blockSize)
+
                 if not matched:
                     startIndex += 1
 
