@@ -79,7 +79,6 @@ class Delta:
 
                 if firstBlock:
                     a, b, weakChecksum = checksum.weakChecksum(block, startIndex, endIndex)
-                    firstBlock = False
                     matched = False
                 else:
                     '''
@@ -139,8 +138,12 @@ class Delta:
                     '''
                     if firstBlock:
                         literalBuffer = bytearray()
+                        firstBlock = False
                     literalBuffer.append(block[0])
             
-            
+            #If there is anything left in the buffer, write it to the file
+            if previousCommand == self.LITERAL_COMMAND:
+                self.__writeLiteralCommand(deltaFile, literalBuffer)
+
             #Write the end commnad to the delta file.
             deltaFile.write(self.END_COMMAND.to_bytes(1, byteorder="big"))
