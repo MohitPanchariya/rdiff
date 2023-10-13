@@ -91,9 +91,9 @@ class Signature:
     The size of the weak checksum is 4 bytes and the size
     of the strong checksum is 16 bytes.
     '''
-    def createSignature(self, inFilePath, sigFilePath):
+    def createSignature(self, basisFilePath, sigFilePath):
         
-        with open(inFilePath, "rb") as inFile, open(sigFilePath, "wb") as sigFile:
+        with open(basisFilePath, "rb") as basisFile, open(sigFilePath, "wb") as sigFile:
             #Write header to the signature file
             weakChecksumType = 0
             strongChecksumType = 0
@@ -110,7 +110,7 @@ class Signature:
             startIndex = 0
             endIndex = 0
 
-            for block in iter(partial(inFile.read, self.blockSize), b''):
+            for block in iter(partial(basisFile.read, self.blockSize), b''):
                 blockSize = len(block)
                 endIndex += (blockSize - 1)
                 _, _, weakChecksum = self.checksum.weakChecksum(block, startIndex, endIndex)
