@@ -54,7 +54,7 @@ class Delta:
         deltaFile.write(len(buffer).to_bytes(4, byteorder="big"))
         deltaFile.write(buffer)
 
-    def createDeltaFile(self, basisFilePath, deltaFilePath, sigFielPath, blockSize: int, checksum: Checksum):
+    def createDeltaFile(self, inFilePath, deltaFilePath, sigFielPath, blockSize: int, checksum: Checksum):
         self.__createSignatureDict(sigFielPath)
         signatures = self.signatures
         
@@ -64,9 +64,9 @@ class Delta:
         '''
         previousCommand = -1
 
-        with (open(basisFilePath, "rb") as basisFile,
+        with (open(inFilePath, "rb") as inFile,
               open(deltaFilePath, "wb") as deltaFile):
-            block = basisFile.read(blockSize)
+            block = inFile.read(blockSize)
 
             if not block:
                 return
@@ -74,7 +74,7 @@ class Delta:
             startIndex = 0
             firstBlock = True
 
-            for block in iter(partial(basisFile.read, blockSize), b''):
+            for block in iter(partial(inFile.read, blockSize), b''):
                 endIndex = (startIndex) + (len(block) - 1)
 
                 if firstBlock:
@@ -123,7 +123,7 @@ class Delta:
                     startIndex += 1
 
                     previousByte = block[0]
-                    basisFile.seek(startIndex, 0)
+                    inFile.seek(startIndex, 0)
 
                     previousCommand = self.LITERAL_COMMAND
                     '''
