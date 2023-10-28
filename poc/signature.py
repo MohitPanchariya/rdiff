@@ -11,6 +11,7 @@ a basis file.
 """
 
 import hashlib
+import enum
 from functools import partial
 
 
@@ -23,6 +24,16 @@ class Checksum:
     More information about the weak checksum can be found at the link below:
     https://rsync.samba.org/tech_report/node2.html
     """
+
+    class ChecksumSizes(enum.Enum):
+        """
+        Enum to represent the size taken by the checksums in bytes.
+        The weak checksum is 4 bytes long.
+        The strong md4 checksum is 16 bytes long.
+        """
+
+        WEAK_CHECKSUM_SIZE = 4
+        STRONG_CHECKSUM_SIZE = 16
 
     def __init__(self) -> None:
         self.modulus = 2**16
@@ -92,18 +103,6 @@ class Checksum:
         """
         return hashlib.new("md4", block).digest()
 
-    def weakChecksumSize():
-        """
-        Size of weak checksum in bytes
-        """
-        return 4
-
-    def strongChecksumSize():
-        """
-        Size of strong checksum in bytes
-        """
-        return 16
-
 
 class Signature:
     """
@@ -152,7 +151,7 @@ class Signature:
             )
             sigFile.write(self.blockSize.to_bytes(self.BLOCK_SIZE, byteorder="big"))
 
-            weakChecksumSize = Checksum.weakChecksumSize()
+            weakChecksumSize = Checksum.ChecksumSizes.WEAK_CHECKSUM_SIZE
 
             startIndex = 0
             endIndex = 0
