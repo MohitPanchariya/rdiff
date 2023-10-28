@@ -6,14 +6,13 @@ class Checksum:
     def __init__(self) -> None:
         self.modulus = 2**16
 
-    """
-    Calculate the weak checksum for the block.
-    The weak checksum is the same as the one 
-    used in the rsync algorithm.
-    https://rsync.samba.org/tech_report/node3.html
-    """
-
     def weakChecksum(self, block: bytes, startIndex: int, endIndex: int):
+        """
+        Calculate the weak checksum for the block.
+        The weak checksum is the same as the one 
+        used in the rsync algorithm.
+        https://rsync.samba.org/tech_report/node3.html
+        """
         a = b = s = 0
         blockSize = len(block)
 
@@ -56,28 +55,28 @@ class Checksum:
 
         return (checksumA, checksumB, checksumS)
 
-    """
-    Calculate the strong checksum for the block.
-    The hash algorithm used is md4, same as the
-    one used in the rsync algorithm.
-    https://rsync.samba.org/tech_report/node2.html
-    """
 
     def strongChecksum(self, block: bytes):
+        """
+        Calculate the strong checksum for the block.
+        The hash algorithm used is md4, same as the
+        one used in the rsync algorithm.
+        https://rsync.samba.org/tech_report/node2.html
+        """
         return hashlib.new("md4", block).digest()
 
-    """
-    Size of weak checksum in bytes
-    """
 
     def weakChecksumSize():
+        """
+        Size of weak checksum in bytes
+        """
         return 4
 
-    """
-    Size of strong checksum in bytes
-    """
 
     def strongChecksumSize():
+        """
+        Size of strong checksum in bytes
+        """
         return 16
 
 
@@ -94,18 +93,18 @@ class Signature:
     def setBlockSize(self, blockSize: int):
         self.blockSize = blockSize
 
-    """
-    Create the signature file. The signatures are
-    written to the sigFilePath.
-    In this POC its assumed that there is only one
-    weak checksum type and only strong checksum type.
-    Hence, the header remains the same for any signature
-    file.
-    The size of the weak checksum is 4 bytes and the size
-    of the strong checksum is 16 bytes.
-    """
 
     def createSignature(self, basisFilePath, sigFilePath):
+        """
+        Create the signature file. The signatures are
+        written to the sigFilePath.
+        In this POC its assumed that there is only one
+        weak checksum type and only strong checksum type.
+        Hence, the header remains the same for any signature
+        file.
+        The size of the weak checksum is 4 bytes and the size
+        of the strong checksum is 16 bytes.
+        """
         with open(basisFilePath, "rb") as basisFile, open(sigFilePath, "wb") as sigFile:
             # Write header to the signature file
             weakChecksumType = 0
