@@ -1,5 +1,5 @@
 from functools import partial
-from signature import Checksum, Signature
+from signature import Checksum
 
 
 class Delta:
@@ -23,9 +23,9 @@ class Delta:
     def __createSignatureDict(self, sigFilePath):
         with open(sigFilePath, "rb") as sigFile:
             # Read the header
-            weakChecksumType = sigFile.read(self.WEAK_CHECKSUM_TYPE_SIZE)
-            strongChecksumType = sigFile.read(self.STRONG_CHECKSUM_TYPE_SIZE)
-            blockSize = sigFile.read(self.BLOCK_SIZE)
+            sigFile.read(self.WEAK_CHECKSUM_TYPE_SIZE)
+            sigFile.read(self.STRONG_CHECKSUM_TYPE_SIZE)
+            sigFile.read(self.BLOCK_SIZE)
 
             blockIndex = 0
 
@@ -58,13 +58,16 @@ class Delta:
     def createDeltaFile(
         self, inFilePath, deltaFilePath, sigFielPath, blockSize: int, checksum: Checksum
     ):
+        '''
+        This function creates the delta file. This file has instructions to
+        create the file to be synchronised
+        '''
         self.__createSignatureDict(sigFielPath)
         signatures = self.signatures
 
-        """
-        Store the previous command written to the delta file.
-        Useful to batch literal commands.
-        """
+        # Store the previous command written to the delta file.
+        # Useful to batch literal commands.
+
         previousCommand = -1
 
         with open(inFilePath, "rb") as inFile, open(deltaFilePath, "wb") as deltaFile:
@@ -80,10 +83,9 @@ class Delta:
                     )
                     matched = False
                 else:
-                    """
-                    If the previous block's strong checksum matched, find the
-                    regular weak checksum
-                    """
+                    # If the previous block's strong checksum matched, find the
+                    # regular weak checksum
+
                     if matched:
                         a, b, weakChecksum = checksum.weakChecksum(
                             block, startIndex, endIndex
@@ -112,13 +114,13 @@ class Delta:
                         # Get the block index of the matched block
                         blockIndex = signatures[weakChecksum][0]
                         blockSize = len(block)
-                        """
-                        The reason to call it previous command is that when a
-                        literal command is issued, the literals can be batched
-                        based on whether the previous command was a literal command
-                        or not. Hence, as a way to determine if the byte can be 
-                        batched, the previousCommand variable is maintained.
-                        """
+
+                        # The reason to call it previous command is that when a
+                        # literal command is issued, the literals can be batched
+                        # based on whether the previous command was a literal command
+                        # or not. Hence, as a way to determine if the byte can be
+                        # batched, the previousCommand variable is maintained.
+
                         previousCommand = self.COPY_COMMAND
 
                         self.__writeCopyCommand(deltaFile, blockIndex, blockSize)
@@ -133,17 +135,17 @@ class Delta:
                     inFile.seek(startIndex, 0)
 
                     previousCommand = self.LITERAL_COMMAND
-                    """
-                    Since there isn't a match, write a literal command.
-                    Maintain a buffer of literal bytes.
-                    These bytes are not written immediately so that they can
-                    be batched. This is to reduce the overhead of the literal
-                    command. If they aren't batched, the size taken by the over
-                    heads exceeds the size of the data, which is only one byte.
-                    The literal command takes one byte, the length will take a byte
-                    followed by the byte. Thats 2 bytes of overhead per one byte of
-                    literal data. This leads to wastage.
-                    """
+
+                    # Since there isn't a match, write a literal command.
+                    # Maintain a buffer of literal bytes.
+                    # These bytes are not written immediately so that they can
+                    # be batched. This is to reduce the overhead of the literal
+                    # command. If they aren't batched, the size taken by the over
+                    # heads exceeds the size of the data, which is only one byte.
+                    # The literal command takes one byte, the length will take a byte
+                    # followed by the byte. Thats 2 bytes of overhead per one byte of
+                    # literal data. This leads to wastage.
+
                     if firstBlock:
                         literalBuffer = bytearray()
                         firstBlock = False
