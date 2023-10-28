@@ -1,15 +1,36 @@
+"""
+This module contains the Checksum and Signature classes.
+
+Instnaces of the Checksum class can be used to compute the weak, 
+the rolling and the strong checksums. 
+Refer the link below for more info about the checksums:
+https://rsync.samba.org/tech_report/node2.html
+
+Instances of the Signature class can be used to create the signature file using
+a basis file.
+"""
+
 import hashlib
 from functools import partial
 
 
 class Checksum:
+    """
+    This class can be used to compute the weak and strong checksums.
+    The strong checksum used in this class is the MD4 hash.
+    The rolling checksum used is the same as the one described in the rsync
+    algorithm paper.
+    More information about the weak checksum can be found at the link below:
+    https://rsync.samba.org/tech_report/node2.html
+    """
+
     def __init__(self) -> None:
         self.modulus = 2**16
 
     def weakChecksum(self, block: bytes, startIndex: int, endIndex: int):
         """
         Calculate the weak checksum for the block.
-        The weak checksum is the same as the one 
+        The weak checksum is the same as the one
         used in the rsync algorithm.
         https://rsync.samba.org/tech_report/node3.html
         """
@@ -18,7 +39,7 @@ class Checksum:
 
         if blockSize != (endIndex - startIndex + 1):
             raise Exception(
-                "Inconsistent start and end index. Doesn't " "match block size."
+                "Inconsistent start and end index. Doesn't match block size."
             )
 
         i = startIndex
@@ -44,6 +65,13 @@ class Checksum:
         startIndex: int,
         endIndex: int,
     ):
+        """
+        The rolling checksum function is used to compute the weak checksum
+        on a rolling basis.
+        More information about the rolling checksum can be found at the link
+        below:
+        https://rsync.samba.org/tech_report/node3.html
+        """
         checksumA = (previousChecksumA - previousByte + endByte) % self.modulus
         checksumB = (
             previousChecksumB
@@ -55,7 +83,6 @@ class Checksum:
 
         return (checksumA, checksumB, checksumS)
 
-
     def strongChecksum(self, block: bytes):
         """
         Calculate the strong checksum for the block.
@@ -65,13 +92,11 @@ class Checksum:
         """
         return hashlib.new("md4", block).digest()
 
-
     def weakChecksumSize():
         """
         Size of weak checksum in bytes
         """
         return 4
-
 
     def strongChecksumSize():
         """
@@ -81,6 +106,12 @@ class Checksum:
 
 
 class Signature:
+    """
+    Instances of the Signature class primarily used to create the signature
+    file using the create signature method.
+    These signatures are sent over to the machine which has the updated file.
+    """
+
     # Sizes in bytes
     WEAK_CHECKSUM_SIZE = 2
     STRONG_CHECKSUM_SIZE = 2
@@ -91,8 +122,11 @@ class Signature:
         self.checksum = checksum
 
     def setBlockSize(self, blockSize: int):
+        """
+        The basis file is divided into equal sized blocks. Set the size of the
+        block.
+        """
         self.blockSize = blockSize
-
 
     def createSignature(self, basisFilePath, sigFilePath):
         """
