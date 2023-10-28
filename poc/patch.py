@@ -40,10 +40,8 @@ class Patch:
                     outFile.write(block)
 
                 elif command == self.LITERAL_COMMAND:
-                    """
-                    The number of literals to be copied from the delta file is
-                    represented using 4 bytes.
-                    """
+                    # The number of literals to be copied from the delta file is
+                    # represented using 4 bytes.
                     bytesToRead = int.from_bytes(deltaFile.read(4), byteorder="big")
                     # Read literals from the delta file
                     block = deltaFile.read(bytesToRead)
