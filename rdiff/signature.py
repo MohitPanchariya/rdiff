@@ -25,7 +25,7 @@ class Checksum:
     https://rsync.samba.org/tech_report/node2.html
     """
 
-    class ChecksumSizes(enum.Enum):
+    class ChecksumSizes(enum.IntEnum):
         """
         Enum to represent the size taken by the checksums in bytes.
         The weak checksum is 4 bytes long.
@@ -111,7 +111,7 @@ class Signature:
     These signatures are sent over to the machine which has the updated file.
     """
 
-    class Header(enum.Enum):
+    class Header(enum.IntEnum):
         """
         Sizes of the different parts of the header in bytes
         """
