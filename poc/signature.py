@@ -111,10 +111,14 @@ class Signature:
     These signatures are sent over to the machine which has the updated file.
     """
 
-    # Sizes in bytes
-    WEAK_CHECKSUM_SIZE = 2
-    STRONG_CHECKSUM_SIZE = 2
-    BLOCK_SIZE = 4
+    class Header(enum.Enum):
+        """
+        Sizes of the different parts of the header in bytes
+        """
+
+        WEAK_CHECKSUM = 2
+        STRONG_CHECKSUM = 2
+        BLOCK = 4
 
     def __init__(self, checksum: Checksum, blockSize: int = 1024):
         self.blockSize = blockSize
@@ -127,7 +131,7 @@ class Signature:
         """
         self.blockSize = blockSize
 
-    def createSignature(self, basisFilePath, sigFilePath):
+    def createSignature(self, basisFilePath: str, sigFilePath: str):
         """
         Create the signature file. The signatures are
         written to the sigFilePath.
@@ -144,12 +148,18 @@ class Signature:
             strongChecksumType = 0
 
             sigFile.write(
-                weakChecksumType.to_bytes(self.WEAK_CHECKSUM_SIZE, byteorder="big")
+                weakChecksumType.to_bytes(
+                    Signature.Header.WEAK_CHECKSUM, byteorder="big"
+                )
             )
             sigFile.write(
-                strongChecksumType.to_bytes(self.STRONG_CHECKSUM_SIZE, byteorder="big")
+                strongChecksumType.to_bytes(
+                    Signature.Header.STRONG_CHECKSUM, byteorder="big"
+                )
             )
-            sigFile.write(self.blockSize.to_bytes(self.BLOCK_SIZE, byteorder="big"))
+            sigFile.write(
+                self.blockSize.to_bytes(Signature.Header.BLOCK, byteorder="big")
+            )
 
             weakChecksumSize = Checksum.ChecksumSizes.WEAK_CHECKSUM_SIZE
 
