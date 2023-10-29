@@ -1,8 +1,20 @@
+"""
+This module contains the Delta class which is primarily used to create the 
+delta file. This delta file is sent over to the machine interested in updating
+their file to have the same contents as the sender.
+"""
+
 from functools import partial
 from signature import Checksum
 
 
 class Delta:
+    """
+    This class is used to create the delta file which contains instructions on
+    how a machine can update its file to have the same contents as the machine
+    sending the delta file.
+    """
+
     # Sizes in bytes
     WEAK_CHECKSUM_TYPE_SIZE = 2
     STRONG_CHECKSUM_TYPE_SIZE = 2
@@ -58,10 +70,10 @@ class Delta:
     def createDeltaFile(
         self, inFilePath, deltaFilePath, sigFielPath, blockSize: int, checksum: Checksum
     ):
-        '''
+        """
         This function creates the delta file. This file has instructions to
         create the file to be synchronised
-        '''
+        """
         self.__createSignatureDict(sigFielPath)
         signatures = self.signatures
 

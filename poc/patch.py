@@ -1,3 +1,8 @@
+"""
+This module contains the Patch class which is uses the delta file to synchronise
+a local copy of a file to have the same contents as the machine sending the
+delta file
+"""
 from functools import partial
 
 
@@ -19,13 +24,17 @@ class Patch:
             open(basisFilePath, "rb") as basisFile,
             open(outFilePath, "wb") as outFile,
         ):
+            """
+            This function is used to create the final synchronised file using
+            the delta file and the basis file.
+            """
             for command in iter(partial(deltaFile.read, self.COMMAND_SIZE), b""):
                 command = int.from_bytes(command, byteorder="big")
                 # Return if reached end of file
                 if command == self.END_COMMAND:
                     return
 
-                elif command == self.COPY_COMMAND:
+                if command == self.COPY_COMMAND:
                     # Size of block index is represented using 4 bytes in the delta file
                     blockIndex = int.from_bytes(deltaFile.read(4), byteorder="big")
                     # Number of bytes to read is represented using 4 bytes in the delta file
