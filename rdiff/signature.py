@@ -10,10 +10,9 @@ Instances of the Signature class can be used to create the signature file using
 a basis file.
 """
 
-import hashlib
 import enum
 from functools import partial
-
+import md4
 
 class Checksum:
     """
@@ -101,7 +100,7 @@ class Checksum:
         one used in the rsync algorithm.
         https://rsync.samba.org/tech_report/node2.html
         """
-        return hashlib.new("md4", block).digest()
+        return md4.MD4(block).bytes()
 
 
 class Signature:
