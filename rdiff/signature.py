@@ -12,7 +12,7 @@ a basis file.
 
 import enum
 from functools import partial
-import md4
+import rdiff.md4 as md4
 
 class Checksum:
     """

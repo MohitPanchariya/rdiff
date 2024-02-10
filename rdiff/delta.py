@@ -5,7 +5,7 @@ their file to have the same contents as the sender.
 """
 
 from functools import partial
-from signature import Checksum
+from rdiff.signature import Checksum
 
 
 class Delta:
