@@ -6,5 +6,5 @@ the diff of a file on a remote machine.
 
 ## Note:
 This tool isn't concerned with how the signature, and delta files are
-sent/received over the network. Its only concerened with working with these files
+sent/received over the network. It's only concerned with working with these files
 and performing the patch.
